@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scullery", "Scullery\Scullery.csproj", "{FE11A86F-85BB-4F91-AB74-D65541B610DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scullery.Test", "Scullery.Test\Scullery.Test.csproj", "{81895F06-B47C-4497-A4FA-02313C1BBEC9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FE11A86F-85BB-4F91-AB74-D65541B610DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE11A86F-85BB-4F91-AB74-D65541B610DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE11A86F-85BB-4F91-AB74-D65541B610DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE11A86F-85BB-4F91-AB74-D65541B610DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81895F06-B47C-4497-A4FA-02313C1BBEC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81895F06-B47C-4497-A4FA-02313C1BBEC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81895F06-B47C-4497-A4FA-02313C1BBEC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81895F06-B47C-4497-A4FA-02313C1BBEC9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E17568E2-C6AA-4D4A-A1B6-564BE81EC11F}
+	EndGlobalSection
+EndGlobal
