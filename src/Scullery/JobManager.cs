@@ -17,14 +17,22 @@ namespace Scullery
 
         public Task<string> EnqueueAsync(Expression<Action> expression)
         {
-            JobDescriptor job = JobResolver.Describe(expression);
-            return _jobStore.EnqueueAsync(job);
+            return _jobStore.EnqueueAsync(JobResolver.Describe(expression));
         }
 
         public Task<string> EnqueueAsync(Expression<Func<Task>> expression)
         {
-            JobDescriptor job = JobResolver.Describe(expression);
-            return _jobStore.EnqueueAsync(job);
+            return _jobStore.EnqueueAsync(JobResolver.Describe(expression));
+        }
+
+        public Task<string> EnqueueAsync<T>(Expression<Action<T>> expression)
+        {
+            return _jobStore.EnqueueAsync(JobResolver.Describe<T>(expression));
+        }
+
+        public Task<string> EnqueueAsync<T>(Expression<Func<T, Task>> expression)
+        {
+            return _jobStore.EnqueueAsync(JobResolver.Describe<T>(expression));
         }
     }
 }

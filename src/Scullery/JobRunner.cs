@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Scullery
 {
@@ -18,6 +19,13 @@ namespace Scullery
     {
         public const string VoidTypeName = "System.Void";
         public const string TaskTypeName = "System.Threading.Tasks.Task";
+
+        private readonly IServiceProvider _services;
+
+        public JobRunner(IServiceProvider services)
+        {
+            _services = services;
+        }
 
         public async Task RunAsync(JobDescriptor job, CancellationToken cancellationToken)
         {
@@ -42,7 +50,7 @@ namespace Scullery
 
             object[] args = CoerceArguments(job.Arguments);
 
-            InvokeMember(job.Type, job.Method, args);
+            InvokeMember(job.Type, job.IsStatic, job.Method, args);
         }
 
         public Task InvokeAsync(JobDescriptor job, CancellationToken cancellationToken)
@@ -52,7 +60,7 @@ namespace Scullery
 
             object[] args = CoerceArguments(job.Arguments);
 
-            object result = InvokeMember(job.Type, job.Method, args);
+            object result = InvokeMember(job.Type, job.IsStatic, job.Method, args);
 
             return (Task)result;
         }
@@ -66,13 +74,22 @@ namespace Scullery
             }).ToArray();
         }
 
-        public object InvokeMember(string assemblyQualifiedName, string methodName, object[] args)
+        public object InvokeMember(string assemblyQualifiedName, bool isStatic, string methodName, object[] args)
         {
             Type calledType = Type.GetType(assemblyQualifiedName);
-            return calledType.InvokeMember(
-                methodName,
-                BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Static,
-                null, null, args);
+            object instance = null;
+            BindingFlags flags = BindingFlags.InvokeMethod | BindingFlags.Public;
+            if (isStatic)
+            {
+                flags |= BindingFlags.Static;
+            }
+            else
+            {
+                flags |= BindingFlags.Instance;
+                // instance = Activator.CreateInstance(calledType);
+                instance = ActivatorUtilities.CreateInstance(_services, calledType);
+            }
+            return calledType.InvokeMember(methodName, flags, null, instance, args);
         }
     }
 }

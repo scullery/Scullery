@@ -14,7 +14,7 @@ namespace Scullery.Test
         {
             var testStore = new TestStore();
             var jobManager = new JobManager(testStore);
-            var jobRunner = new JobRunner();
+            var jobRunner = new JobRunner(null);
 
             await jobManager.EnqueueAsync(() => TestJobs.Job1(1));
             JobRecord job = await testStore.NextAsync(CancellationToken.None);
@@ -27,11 +27,39 @@ namespace Scullery.Test
         {
             var testStore = new TestStore();
             var jobManager = new JobManager(testStore);
-            var jobRunner = new JobRunner();
+            var jobRunner = new JobRunner(null);
 
             await jobManager.EnqueueAsync(() => TestJobs.AsyncJob1(1));
             JobRecord job = await testStore.NextAsync(CancellationToken.None);
             Assert.Equal("AsyncJob1", job.Descriptor.Method);
+            await jobRunner.InvokeAsync(job.Descriptor, CancellationToken.None);
+        }
+
+        [Fact]
+        public async Task Enqueue_VoidInstanceMethod_ShouldSucceed()
+        {
+            var testServiceProvider = new TestServiceProvider();
+            var testStore = new TestStore();
+            var jobManager = new JobManager(testStore);
+            var jobRunner = new JobRunner(testServiceProvider);
+
+            await jobManager.EnqueueAsync<TestJobs>((t) => t.InstanceJob1(1));
+            JobRecord job = await testStore.NextAsync(CancellationToken.None);
+            Assert.Equal("InstanceJob1", job.Descriptor.Method);
+            jobRunner.Invoke(job.Descriptor, CancellationToken.None);
+        }
+
+        [Fact]
+        public async Task Enqueue_AsyncInstanceMethod_ShouldSucceed()
+        {
+            var testServiceProvider = new TestServiceProvider();
+            var testStore = new TestStore();
+            var jobManager = new JobManager(testStore);
+            var jobRunner = new JobRunner(testServiceProvider);
+
+            await jobManager.EnqueueAsync<TestJobs>((t) => t.InstanceJobAsync1(1));
+            JobRecord job = await testStore.NextAsync(CancellationToken.None);
+            Assert.Equal("InstanceJobAsync1", job.Descriptor.Method);
             await jobRunner.InvokeAsync(job.Descriptor, CancellationToken.None);
         }
     }

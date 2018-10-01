@@ -15,6 +15,7 @@ namespace Scullery
         public string Type { get; set; }
         public string Method { get; set; }
         public string Returns { get; set; }
+        public bool IsStatic { get; set; }
         public List<JobArgument> Arguments { get; set; }
     }
 }

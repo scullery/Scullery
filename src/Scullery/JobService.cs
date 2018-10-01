@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Scullery
@@ -17,20 +18,17 @@ namespace Scullery
     public class JobService : BackgroundService
     {
         private readonly ILogger<JobService> _logger;
-        //private readonly IJobQueue _queue;
+        private readonly IServiceProvider _services;
         private readonly IJobStore _jobStore;
-        private readonly IJobRunner _jobRunner;
 
         public JobService(
-            //ILoggerFactory loggerFactory,
             ILogger<JobService> logger,
-            IJobStore jobStore,
-            IJobRunner jobRunner)
+            IServiceProvider services,
+            IJobStore jobStore)
         {
-            //_logger = loggerFactory.CreateLogger<JobService>();
             _logger = logger;
+            _services = services;
             _jobStore = jobStore;
-            _jobRunner = jobRunner;
         }
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
@@ -52,7 +50,11 @@ namespace Scullery
 
                 try
                 {
-                    await _jobRunner.RunAsync(job.Descriptor, cancellationToken);
+                    using (var scope = _services.CreateScope())
+                    {
+                        var jobRunner = new JobRunner(scope.ServiceProvider);
+                        await jobRunner.RunAsync(job.Descriptor, cancellationToken);
+                    }
 
                     await _jobStore.SucceededAsync(job.Id);
                 }

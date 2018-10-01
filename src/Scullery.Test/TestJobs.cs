@@ -16,6 +16,15 @@ namespace Scullery.Test
             return Task.CompletedTask;
         }
 
+        public void InstanceJob1(int n)
+        {
+        }
+
+        public Task InstanceJobAsync1(int n)
+        {
+            return Task.CompletedTask;
+        }
+
         public static void ErrorJob()
         {
             throw new Exception("Job error");
