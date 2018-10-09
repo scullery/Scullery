@@ -8,13 +8,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Scullery
 {
-    public interface IJobQueue
-    {
-        Task<(string id, Func<CancellationToken, Task> job)> DequeueAsync(CancellationToken cancellationToken);
-        Task SucceededAsync(string id);
-        Task FailedAsync(string id, Exception ex);
-    }
-
     public class JobService : BackgroundService
     {
         private readonly ILogger<JobService> _logger;

@@ -12,7 +12,7 @@ namespace Scullery.Test
         [Fact]
         public async Task Enqueue_VoidMethod_ShouldSucceed()
         {
-            var testStore = new TestStore();
+            var testStore = new MemoryJobStore();
             var jobManager = new JobManager(testStore);
             var jobRunner = new JobRunner(null);
 
@@ -25,7 +25,7 @@ namespace Scullery.Test
         [Fact]
         public async Task Enqueue_AsyncMethod_ShouldSucceed()
         {
-            var testStore = new TestStore();
+            var testStore = new MemoryJobStore();
             var jobManager = new JobManager(testStore);
             var jobRunner = new JobRunner(null);
 
@@ -39,7 +39,7 @@ namespace Scullery.Test
         public async Task Enqueue_VoidInstanceMethod_ShouldSucceed()
         {
             var testServiceProvider = new TestServiceProvider();
-            var testStore = new TestStore();
+            var testStore = new MemoryJobStore();
             var jobManager = new JobManager(testStore);
             var jobRunner = new JobRunner(testServiceProvider);
 
@@ -53,7 +53,7 @@ namespace Scullery.Test
         public async Task Enqueue_AsyncInstanceMethod_ShouldSucceed()
         {
             var testServiceProvider = new TestServiceProvider();
-            var testStore = new TestStore();
+            var testStore = new MemoryJobStore();
             var jobManager = new JobManager(testStore);
             var jobRunner = new JobRunner(testServiceProvider);
 
