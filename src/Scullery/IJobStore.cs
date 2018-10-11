@@ -6,10 +6,24 @@ using System.Threading.Tasks;
 
 namespace Scullery
 {
-    public class JobRecord
+    public enum JobStatus
+    {
+        Waiting,
+        Ready,
+        Running,
+        Failed,
+        Succeeded,
+    }
+
+    public class JobDescriptor
     {
         public string Id { get; set; }
-        public JobDescriptor Descriptor { get; set; }
+        public string Name { get; set; }
+        public string Cron { get; set; }
+        public DateTime? Scheduled { get; set; }
+        public TimeZoneInfo TimeZone { get; set; }
+        public JobStatus Status { get; set; }
+        public JobCall Call { get; set; }
     }
 
     public interface IJobStore
@@ -18,10 +32,16 @@ namespace Scullery
         /// Waits until a job is ready and returns it.
         /// </summary>
         /// <returns>The ID and the descriptor of the next job. If the token is cancelled, returns nulls.</returns>
-        Task<JobRecord> NextAsync(CancellationToken cancellationToken);
+        Task<JobDescriptor> NextAsync(CancellationToken cancellationToken);
 
-        Task<string> EnqueueAsync(JobDescriptor job);
+        Task<string> EnqueueAsync(JobCall job);
+        Task<string> ScheduleAsync(JobCall job, DateTime scheduled, TimeZoneInfo timeZone = null);
+        Task RecurrentAsync(string name, string cron, JobCall job, TimeZoneInfo timeZone = null);
+        //Task TriggerAsync(string name, string cron, JobCall job, TimeZoneInfo timeZone = null);
+        //Task RemoveRecurrentAsync(string name);
+        //Task DeleteJobAsync(string id);
         Task SucceededAsync(string id);
         Task FailedAsync(string id, Exception ex);
+        Task<int> GetCountByStatusAsync(JobStatus status);
     }
 }

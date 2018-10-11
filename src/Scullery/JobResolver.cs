@@ -9,7 +9,7 @@ namespace Scullery
 {
     public class JobResolver
     {
-        public static JobDescriptor Describe(Expression<Action> expression)
+        public static JobCall Describe(Expression<Action> expression)
         {
             var member = expression.Body as MethodCallExpression;
             if (member == null)
@@ -18,10 +18,10 @@ namespace Scullery
             if (member.Method.ReturnType.FullName != "System.Void")
                 throw new ArgumentException("Method must return void", nameof(expression));
 
-            return CreateDescriptor(member);
+            return CreateCall(member);
         }
 
-        public static JobDescriptor Describe(Expression<Func<Task>> expression)
+        public static JobCall Describe(Expression<Func<Task>> expression)
         {
             var member = expression.Body as MethodCallExpression;
             if (member == null)
@@ -30,10 +30,10 @@ namespace Scullery
             if (member.Method.ReturnType.FullName != "System.Threading.Tasks.Task")
                 throw new ArgumentException("Async method must return a Task", nameof(expression));
 
-            return CreateDescriptor(member);
+            return CreateCall(member);
         }
 
-        public static JobDescriptor Describe<T>(Expression<Action<T>> expression)
+        public static JobCall Describe<T>(Expression<Action<T>> expression)
         {
             var member = expression.Body as MethodCallExpression;
             if (member == null)
@@ -42,10 +42,10 @@ namespace Scullery
             if (member.Method.ReturnType.FullName != "System.Void")
                 throw new ArgumentException("Method must return void", nameof(expression));
 
-            return CreateDescriptor(member);
+            return CreateCall(member);
         }
 
-        public static JobDescriptor Describe<T>(Expression<Func<T, Task>> expression)
+        public static JobCall Describe<T>(Expression<Func<T, Task>> expression)
         {
             var member = expression.Body as MethodCallExpression;
             if (member == null)
@@ -54,18 +54,18 @@ namespace Scullery
             if (member.Method.ReturnType.FullName != "System.Threading.Tasks.Task")
                 throw new ArgumentException("Async method must return a Task", nameof(expression));
 
-            return CreateDescriptor(member);
+            return CreateCall(member);
         }
 
-        private static JobDescriptor CreateDescriptor(MethodCallExpression member)
+        private static JobCall CreateCall(MethodCallExpression member)
         {
-            var args = new List<JobArgument>();
+            // var args = new List<JobArgument>();
+            var args = new List<object>();
             foreach (Expression arg in member.Arguments)
             {
-                if (arg is ConstantExpression)
+                if (arg is ConstantExpression exp)
                 {
-                    var exp = arg as ConstantExpression;
-                    args.Add(new JobArgument { Type = exp.Type.FullName, Value = exp.Value });
+                    args.Add(exp.Value);
                 }
                 else
                 {
@@ -73,13 +73,13 @@ namespace Scullery
                 }
             }
 
-            return new JobDescriptor
+            return new JobCall
             {
                 Type = member.Method.DeclaringType.AssemblyQualifiedName,
                 Method = member.Method.Name,
                 Returns = member.Method.ReturnType.FullName,
                 IsStatic = member.Object == null,
-                Arguments = args
+                Arguments = args.ToArray()
             };
         }
     }

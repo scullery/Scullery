@@ -30,7 +30,7 @@ namespace Scullery
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                JobRecord job = await _jobStore.NextAsync(cancellationToken);
+                JobDescriptor job = await _jobStore.NextAsync(cancellationToken);
                 if (job == null)
                 {
                     if (!cancellationToken.IsCancellationRequested)
@@ -46,7 +46,7 @@ namespace Scullery
                     using (var scope = _services.CreateScope())
                     {
                         var jobRunner = new JobRunner(scope.ServiceProvider);
-                        await jobRunner.RunAsync(job.Descriptor, cancellationToken);
+                        await jobRunner.RunAsync(job.Call, cancellationToken);
                     }
 
                     await _jobStore.SucceededAsync(job.Id);

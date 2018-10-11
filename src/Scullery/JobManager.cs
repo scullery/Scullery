@@ -34,5 +34,10 @@ namespace Scullery
         {
             return _jobStore.EnqueueAsync(JobResolver.Describe<T>(expression));
         }
+
+        public Task RecurrentAsync<T>(string name, string cron, Expression<Func<T, Task>> expression, TimeZoneInfo timeZone = null)
+        {
+            return _jobStore.RecurrentAsync(name, cron, JobResolver.Describe<T>(expression));
+        }
     }
 }

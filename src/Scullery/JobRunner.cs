@@ -10,9 +10,7 @@ namespace Scullery
 {
     public interface IJobRunner
     {
-        Task RunAsync(JobDescriptor job, CancellationToken cancellationToken);
-        void Invoke(JobDescriptor job, CancellationToken cancellationToken);
-        Task InvokeAsync(JobDescriptor job, CancellationToken cancellationToken);
+        Task RunAsync(JobCall job, CancellationToken cancellationToken);
     }
 
     public class JobRunner : IJobRunner
@@ -27,7 +25,7 @@ namespace Scullery
             _services = services;
         }
 
-        public async Task RunAsync(JobDescriptor job, CancellationToken cancellationToken)
+        public async Task RunAsync(JobCall job, CancellationToken cancellationToken)
         {
             if (job.Returns == TaskTypeName)
             {
@@ -43,35 +41,22 @@ namespace Scullery
             }
         }
 
-        public void Invoke(JobDescriptor job, CancellationToken cancellationToken)
+        public void Invoke(JobCall job, CancellationToken cancellationToken)
         {
             if (job.Returns != VoidTypeName)
                 throw new ArgumentException("Method must return void", nameof(job));
 
-            object[] args = CoerceArguments(job.Arguments);
-
-            InvokeMember(job.Type, job.IsStatic, job.Method, args);
+            InvokeMember(job.Type, job.IsStatic, job.Method, job.Arguments);
         }
 
-        public Task InvokeAsync(JobDescriptor job, CancellationToken cancellationToken)
+        public Task InvokeAsync(JobCall job, CancellationToken cancellationToken)
         {
             if (job.Returns != TaskTypeName)
                 throw new ArgumentException("Async method must return a Task", nameof(job));
 
-            object[] args = CoerceArguments(job.Arguments);
-
-            object result = InvokeMember(job.Type, job.IsStatic, job.Method, args);
+            object result = InvokeMember(job.Type, job.IsStatic, job.Method, job.Arguments);
 
             return (Task)result;
-        }
-
-        private object[] CoerceArguments(List<JobArgument> arguments)
-        {
-            return arguments.Select(a =>
-            {
-                Type type = Type.GetType(a.Type);
-                return Convert.ChangeType(a.Value, type);
-            }).ToArray();
         }
 
         public object InvokeMember(string assemblyQualifiedName, bool isStatic, string methodName, object[] args)
