@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Scullery.EntityFrameworkCore
+namespace Scullery.EntityFrameworkCore.Test
 {
     public class TestJobs
     {

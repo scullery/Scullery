@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <RootNamespace>Scullery.Test</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Scullery\Scullery.csproj" />
+    <ProjectReference Include="..\Scullery.Core\Scullery.Core.csproj" />
   </ItemGroup>
 
 </Project>

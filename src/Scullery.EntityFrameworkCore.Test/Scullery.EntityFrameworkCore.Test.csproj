@@ -1,11 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
-
-    <RootNamespace>Scullery.EntityFrameworkCore</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,7 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Scullery.EntityFrameworkCore\Scullery.EntityFrameworkCore.csproj" />
-    <ProjectReference Include="..\Scullery\Scullery.csproj" />
+    <ProjectReference Include="..\Scullery.Core\Scullery.Core.csproj" />
   </ItemGroup>
 
 </Project>

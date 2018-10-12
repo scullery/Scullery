@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scullery", "Scullery\Scullery.csproj", "{FE11A86F-85BB-4F91-AB74-D65541B610DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scullery.Core", "Scullery.Core\Scullery.Core.csproj", "{FE11A86F-85BB-4F91-AB74-D65541B610DF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scullery.Test", "Scullery.Test\Scullery.Test.csproj", "{81895F06-B47C-4497-A4FA-02313C1BBEC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scullery.Core.Test", "Scullery.Core.Test\Scullery.Core.Test.csproj", "{81895F06-B47C-4497-A4FA-02313C1BBEC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scullery.EntityFrameworkCore", "Scullery.EntityFrameworkCore\Scullery.EntityFrameworkCore.csproj", "{E689008E-1896-4597-9054-5B23C264EE48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scullery.EntityFrameworkCore", "Scullery.EntityFrameworkCore\Scullery.EntityFrameworkCore.csproj", "{E689008E-1896-4597-9054-5B23C264EE48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scullery.EntityFrameworkCore.Test", "Scullery.EntityFrameworkCore.Test\Scullery.EntityFrameworkCore.Test.csproj", "{DFB11D99-30D3-466E-83BE-6112BF218504}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scullery.EntityFrameworkCore.Test", "Scullery.EntityFrameworkCore.Test\Scullery.EntityFrameworkCore.Test.csproj", "{DFB11D99-30D3-466E-83BE-6112BF218504}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

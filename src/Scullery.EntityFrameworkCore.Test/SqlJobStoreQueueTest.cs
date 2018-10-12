@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace Scullery.EntityFrameworkCore
+namespace Scullery.EntityFrameworkCore.Test
 {
     public class SqlJobStoreQueueTest
     {
