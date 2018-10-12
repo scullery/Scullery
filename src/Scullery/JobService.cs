@@ -17,11 +17,11 @@ namespace Scullery
         public JobService(
             ILogger<JobService> logger,
             IServiceProvider services,
-            IJobStore jobStore)
+            IJobStore jobStore = null)
         {
             _logger = logger;
             _services = services;
-            _jobStore = jobStore;
+            _jobStore = jobStore ?? new MemoryJobStore();
         }
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)

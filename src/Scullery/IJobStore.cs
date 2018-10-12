@@ -31,8 +31,14 @@ namespace Scullery
         /// <summary>
         /// Waits until a job is ready and returns it.
         /// </summary>
-        /// <returns>The ID and the descriptor of the next job. If the token is cancelled, returns nulls.</returns>
+        /// <returns>The the descriptor of the next job. If the token is cancelled, returns nulls.</returns>
         Task<JobDescriptor> NextAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// If a job is available, returns it. Otherwise, returns null.
+        /// </summary>
+        /// <returns>The the descriptor of the next job, if available.</returns>
+        Task<JobDescriptor> TryNextAsync();
 
         Task<string> EnqueueAsync(JobCall job);
         Task<string> ScheduleAsync(JobCall job, DateTime scheduled, TimeZoneInfo timeZone = null);

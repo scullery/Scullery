@@ -15,6 +15,42 @@ namespace Scullery
         private static object _syncLock = new object();
         private int _idSource = 0;
 
+        public Task<JobDescriptor> TryNextAsync()
+        {
+            JobDescriptor waiting;
+            lock (_syncLock)
+            {
+                waiting = _jobs
+                    .Where(d => d.Status == JobStatus.Waiting)
+                    .OrderBy(d => d.Scheduled)
+                    .FirstOrDefault();
+            }
+
+            if (waiting != null)
+            {
+                if (!waiting.Scheduled.HasValue)
+                    throw new InvalidOperationException("A scheduled job must have a time");
+
+                // Convert the scheduled time to UTC for comparison. If 
+                // TimeZone is null, defaults to UTC.
+                DateTime scheduled = waiting.TimeZone == null
+                    ? waiting.Scheduled.Value
+                    : TimeZoneInfo.ConvertTimeToUtc(waiting.Scheduled.Value, waiting.TimeZone);
+
+                DateTime now = DateTime.UtcNow;
+                if (scheduled <= now)
+                {
+                    // This one is ready now. 
+                    _queue.Enqueue(waiting);
+                }
+            }
+
+            JobDescriptor job;
+            _queue.TryDequeue(out job);
+
+            return Task.FromResult(job);
+        }
+
         public async Task<JobDescriptor> NextAsync(CancellationToken cancellationToken)
         {
             JobDescriptor job;

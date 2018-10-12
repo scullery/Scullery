@@ -4,12 +4,6 @@ using System.Text;
 
 namespace Scullery
 {
-    public class JobArgument
-    {
-        public string Type { get; set; }
-        public object Value { get; set; }
-    }
-
     public class JobCall
     {
         public string Type { get; set; }

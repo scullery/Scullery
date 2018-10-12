@@ -63,9 +63,13 @@ namespace Scullery
             var args = new List<object>();
             foreach (Expression arg in member.Arguments)
             {
-                if (arg is ConstantExpression exp)
+                if (arg is ConstantExpression cexp)
                 {
-                    args.Add(exp.Value);
+                    args.Add(cexp.Value);
+                }
+                else if (arg is MemberExpression mexp)
+                {
+                    args.Add(GetValue(mexp));
                 }
                 else
                 {
@@ -81,6 +85,18 @@ namespace Scullery
                 IsStatic = member.Object == null,
                 Arguments = args.ToArray()
             };
+        }
+
+        // https://stackoverflow.com/a/2616980/51558
+        private static object GetValue(MemberExpression member)
+        {
+            var objectMember = Expression.Convert(member, typeof(object));
+
+            var getterLambda = Expression.Lambda<Func<object>>(objectMember);
+
+            var getter = getterLambda.Compile();
+
+            return getter();
         }
     }
 }
