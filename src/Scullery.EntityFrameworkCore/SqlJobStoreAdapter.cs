@@ -7,11 +7,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Scullery.EntityFrameworkCore
 {
-    public class SqlJobStoreQueue : IEntityFrameworkJobStoreQueue
+    /// <summary>
+    /// Adapts the job store to use standard SQL for pulling jobs from the queue.
+    /// This is the default adapter if one is not specified.
+    /// </summary>
+    class SqlJobStoreAdapter : IEntityFrameworkJobStoreAdapter
     {
         public readonly SculleryContext _context;
 
-        public SqlJobStoreQueue(SculleryContext context)
+        public SqlJobStoreAdapter(SculleryContext context)
         {
             _context = context;
         }

@@ -1,0 +1,40 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Scullery.EntityFrameworkCore;
+
+namespace Microsoft.Extensions.DependencyInjection
+{
+    static class DbContextServiceProviderExtensions
+    {
+        public static void InitializeDatabase<T>(this IServiceProvider serviceProvider) where T : DbContext
+        {
+            using (var serviceScope = serviceProvider.CreateScope())
+            {
+                var scopeServiceProvider = serviceScope.ServiceProvider;
+                using (var context = scopeServiceProvider.GetService<T>())
+                {
+                    var logger = scopeServiceProvider.GetRequiredService<ILogger<T>>();
+
+                    if (context.AnyMigrationsRewritten())
+                    {
+                        logger.LogWarning("Recreating database");
+
+                        context.Database.EnsureDeleted();
+                    }
+
+                    if (!context.AllMigrationsApplied())
+                    {
+                        logger.LogInformation("Migrating database");
+
+                        context.Database.Migrate();
+                    }
+                }
+
+                // Seed.EnsureSeedData(scopeServiceProvider);
+            }
+        }
+    }
+}

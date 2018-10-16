@@ -8,28 +8,28 @@ using Xunit;
 
 namespace Scullery.EntityFrameworkCore.Test
 {
-    public class SqlJobStoreQueueTest
+    public class SqlJobStoreAdapterTest
     {
         [Fact]
-        public Task Queue_TryClaimJob_ShouldSucceed()
+        public Task Adapter_TryClaimJob_ShouldSucceed()
         {
             return SqliteInMemoryHelper.UsingSculleryContextAsync(async context =>
             {
-                var storeQueue = new SqlJobStoreQueue(context);
-                var testStore = new EntityFrameworkJobStore(context, null, storeQueue);
+                var storeAdapter = new SqlJobStoreAdapter(context);
+                var testStore = new EntityFrameworkJobStore(context, null, storeAdapter);
                 var jobManager = new JobManager(testStore);
                 var jobRunner = new JobRunner(null);
 
                 await jobManager.EnqueueAsync(() => TestJobs.Job1(1));
                 await jobManager.EnqueueAsync(() => TestJobs.Job1(2));
 
-                Job job1 = await storeQueue.GetCandidateJobAsync();
-                Job job2 = await storeQueue.GetCandidateJobAsync();
+                Job job1 = await storeAdapter.GetCandidateJobAsync();
+                Job job2 = await storeAdapter.GetCandidateJobAsync();
 
-                bool result1 = await storeQueue.TryClaimJobAsync(job1);
+                bool result1 = await storeAdapter.TryClaimJobAsync(job1);
                 Assert.True(result1); // Claim succeeded
 
-                bool result2 = await storeQueue.TryClaimJobAsync(job2);
+                bool result2 = await storeAdapter.TryClaimJobAsync(job2);
                 Assert.False(result2); // Claim failed
             });
         }

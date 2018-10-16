@@ -12,16 +12,13 @@ namespace Scullery
     {
         private readonly ILogger<JobService> _logger;
         private readonly IServiceProvider _services;
-        private readonly IJobStore _jobStore;
 
         public JobService(
             ILogger<JobService> logger,
-            IServiceProvider services,
-            IJobStore jobStore = null)
+            IServiceProvider services)
         {
             _logger = logger;
             _services = services;
-            _jobStore = jobStore ?? new MemoryJobStore();
         }
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
@@ -30,32 +27,44 @@ namespace Scullery
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                JobDescriptor job = await _jobStore.NextAsync(cancellationToken);
-                if (job == null)
+                using (var serviceScope = _services.CreateScope())
                 {
-                    if (!cancellationToken.IsCancellationRequested)
+                    var scopeServiceProvider = serviceScope.ServiceProvider;
+                    IJobStore jobStore = scopeServiceProvider.GetRequiredService<IJobStore>();
+
+                    JobDescriptor job;
+                    try
                     {
-                        throw new Exception("Job store returned null for next job with no cancellation");
+                        job = await jobStore.NextAsync(cancellationToken);
+                        if (job == null)
+                        {
+                            if (!cancellationToken.IsCancellationRequested)
+                            {
+                                throw new Exception("Job store returned null for next job with no cancellation");
+                            }
+
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Error occurred loading job.");
+                        break;
                     }
 
-                    break;
-                }
-
-                try
-                {
-                    using (var scope = _services.CreateScope())
+                    try
                     {
-                        var jobRunner = new JobRunner(scope.ServiceProvider);
+                        var jobRunner = new JobRunner(scopeServiceProvider);
                         await jobRunner.RunAsync(job.Call, cancellationToken);
+
+                        await jobStore.SucceededAsync(job.Id);
                     }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Error occurred executing job.");
 
-                    await _jobStore.SucceededAsync(job.Id);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"Error occurred executing job.");
-
-                    await _jobStore.FailedAsync(job.Id, ex);
+                        await jobStore.FailedAsync(job.Id, ex);
+                    }
                 }
             }
 

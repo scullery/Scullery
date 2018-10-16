@@ -9,32 +9,27 @@ using Newtonsoft.Json;
 
 namespace Scullery.EntityFrameworkCore
 {
-    public interface IEntityFrameworkJobStoreQueue
+    public interface IEntityFrameworkJobStoreAdapter
     {
         Task<Job> TryNextAsync();
     }
 
-    public class EntityFrameworkJobStoreOptions
-    {
-        public int SleepMilliseconds { get; set; }
-    }
-
-    public class EntityFrameworkJobStore : IJobStore
+    internal class EntityFrameworkJobStore : IJobStore
     {
         public readonly SculleryContext _context;
-        public readonly IEntityFrameworkJobStoreQueue _queue;
+        public readonly IEntityFrameworkJobStoreAdapter _adapter;
 
         int _sleepMilliseconds;
 
-        const int _defaultSleepMilliseconds = 15 * 1000;
+        const int _defaultSleepMilliseconds = 5 * 1000;
 
         public EntityFrameworkJobStore(
             SculleryContext context,
-            IOptions<EntityFrameworkJobStoreOptions> options = null,
-            IEntityFrameworkJobStoreQueue queue = null)
+            IOptions<SculleryEntityFrameworkOptions> options = null,
+            IEntityFrameworkJobStoreAdapter adapter = null)
         {
             _context = context;
-            _queue = queue ?? new SqlJobStoreQueue(context);
+            _adapter = adapter ?? new SqlJobStoreAdapter(context);
 
             if (options?.Value == null)
             {
@@ -54,7 +49,7 @@ namespace Scullery.EntityFrameworkCore
         /// <returns>The the descriptor of the next job, if available.</returns>
         public async Task<JobDescriptor> TryNextAsync()
         {
-            Job job = await _queue.TryNextAsync();
+            Job job = await _adapter.TryNextAsync();
             if (job == null)
             {
                 return null;
@@ -91,15 +86,16 @@ namespace Scullery.EntityFrameworkCore
 
             do
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    // Returning null is OK in this case.
+                    return null;
+                }
+
                 job = await TryNextAsync();
                 if (job == null)
                 {
-                    await Task.Delay(_defaultSleepMilliseconds, cancellationToken);
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        // Returning null is OK in this case.
-                        return null;
-                    }
+                    await Task.Delay(_sleepMilliseconds, cancellationToken);
                 }
             } while (job == null);
 
@@ -211,6 +207,9 @@ namespace Scullery.EntityFrameworkCore
 
         private object[] DeserializeArguments(string parameters, string arguments)
         {
+            if (parameters == null)
+                return new object[0];
+
             List<string> parms = JsonConvert.DeserializeObject<List<string>>(parameters);
             List<string> args = JsonConvert.DeserializeObject<List<string>>(arguments);
             if (parms.Count != args.Count)
