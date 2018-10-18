@@ -1,0 +1,28 @@
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+    <metadata>
+        <id>Scullery</id>
+        <version>0.0.1-alpha</version>
+        <title>Scullery.Core</title>
+        <authors>Todd Lucas</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <licenseUrl>https://opensource.org/licenses/Apache-2.0</licenseUrl>
+        <projectUrl>https://github.com/scullery/Scullery</projectUrl>
+        <description>Simple background job processor for .NET Core</description>
+        <copyright>Copyright © 2018 Todd Lucas</copyright>
+        <tags>scullery aspnetcore background jobs tasks</tags>
+
+        <releaseNotes>This software is experimental
+
+0.0.1-alpha
+
+This is the first alpha release.
+        </releaseNotes>
+
+        <dependencies>
+            <group targetFramework="netstandard2.0">
+                <dependency id="Scullery.Core" version="0.0.1-alpha" />
+                <dependency id="Scullery.EntityFrameworkCore" version="0.0.1-alpha" />
+            </group>
+        </dependencies>
+    </metadata>
+</package>

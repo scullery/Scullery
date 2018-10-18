@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+    <metadata>
+        <id>Scullery.EntityFrameworkCore</id>
+        <version>0.0.1-alpha</version>
+        <title>Scullery.EntityFrameworkCore</title>
+        <authors>Todd Lucas</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <licenseUrl>https://opensource.org/licenses/Apache-2.0</licenseUrl>
+        <projectUrl>https://github.com/scullery/Scullery</projectUrl>
+        <description>Entity Framework Core database provider for Scullery, a simple background job processor for .NET Core</description>
+        <copyright>Copyright © 2018 Todd Lucas</copyright>
+        <tags>scullery aspnetcore background jobs tasks</tags>
+
+        <!-- The icon is used in Visual Studio's package manager UI -->
+        <!-- <iconUrl>http://github.com/contoso/UsefulStuff/nuget_icon.png</iconUrl> -->
+
+        <releaseNotes>This software is experimental
+
+0.0.1-alpha
+
+This is the first alpha release.
+Supports PostgreSQL and Sqlite.
+        </releaseNotes>
+        <dependencies>
+            <group targetFramework="netstandard2.0">
+              <dependency id="Microsoft.EntityFrameworkCore" version="[2.1, )" />
+              <dependency id="Microsoft.EntityFrameworkCore.Relational" version="[2.1, )" />
+              <dependency id="Microsoft.EntityFrameworkCore.Relational" version="[2.1, )" />
+              <dependency id="Newtonsoft.Json" version="[11.0.1, )" />
+            </group>
+        </dependencies>
+    </metadata>
+</package>

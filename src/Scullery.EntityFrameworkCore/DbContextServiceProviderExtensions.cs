@@ -18,16 +18,27 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     var logger = scopeServiceProvider.GetRequiredService<ILogger<T>>();
 
-                    if (context.AnyMigrationsRewritten())
+                    if (context.IsExistingDatabase())
                     {
-                        logger.LogWarning("Recreating database");
+                        logger.LogTrace("Database exists");
 
-                        context.Database.EnsureDeleted();
+                        if (context.AnyMigrationsRewritten())
+                        {
+                            logger.LogWarning("Recreating database");
+
+                            context.Database.EnsureDeleted();
+                        }
+
+                        if (!context.AllMigrationsApplied())
+                        {
+                            logger.LogInformation("Migrating database");
+
+                            context.Database.Migrate();
+                        }
                     }
-
-                    if (!context.AllMigrationsApplied())
+                    else
                     {
-                        logger.LogInformation("Migrating database");
+                        logger.LogInformation("Creating database");
 
                         context.Database.Migrate();
                     }

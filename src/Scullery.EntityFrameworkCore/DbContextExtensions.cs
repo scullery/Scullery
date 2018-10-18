@@ -4,12 +4,20 @@ using System.Linq;
 using System.Text;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.EntityFrameworkCore
 {
     public static class DbContextExtensions
     {
+        public static bool IsExistingDatabase(this DbContext context)
+        {
+            var databaseCreator = context.Database.GetService<IDatabaseCreator>();
+            var relationalCreator = (databaseCreator as RelationalDatabaseCreator);
+            return relationalCreator.Exists();
+        }
+
         public static bool AllMigrationsApplied(this DbContext context)
         {
             var applied = context.GetService<IHistoryRepository>()
