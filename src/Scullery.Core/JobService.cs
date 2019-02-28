@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Scullery
 {
@@ -12,12 +13,15 @@ namespace Scullery
     {
         private readonly ILogger<JobService> _logger;
         private readonly IServiceProvider _services;
+        private readonly SculleryOptions _options;
 
         public JobService(
             ILogger<JobService> logger,
+            IOptions<SculleryOptions> optionsAccessor,
             IServiceProvider services)
         {
             _logger = logger;
+            _options = optionsAccessor.Value;
             _services = services;
         }
 
@@ -49,15 +53,43 @@ namespace Scullery
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, $"Error occurred loading job.");
+
+                        IJobServiceEvents jobServiceEvents = scopeServiceProvider.GetRequiredService<IJobServiceEvents>();
+                        await jobServiceEvents.OnStoppedAsync($"Error occurred loading job.", ex);
+
                         break;
                     }
 
                     try
                     {
                         var jobRunner = new JobRunner(scopeServiceProvider);
-                        await jobRunner.RunAsync(job.Call, cancellationToken);
-
-                        await jobStore.SucceededAsync(job.Id);
+                        if (_options.JobTimeout.HasValue)
+                        {
+                            var timeoutCts = new CancellationTokenSource(_options.JobTimeout.Value);
+                            using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token))
+                            {
+                                await jobRunner.RunAsync(job.Call, cancellationToken);
+                                if (cancellationToken.IsCancellationRequested)
+                                {
+                                    _logger.LogError($"Job cancelled.");
+                                    await jobStore.FailedAsync(job.Id, ex: null);
+                                }
+                                else if (timeoutCts.IsCancellationRequested)
+                                {
+                                    _logger.LogError($"Job timed out.");
+                                    await jobStore.FailedAsync(job.Id, ex: null);
+                                }
+                                else
+                                {
+                                    await jobStore.SucceededAsync(job.Id);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            await jobRunner.RunAsync(job.Call, cancellationToken);
+                            await jobStore.SucceededAsync(job.Id);
+                        }
                     }
                     catch (Exception ex)
                     {

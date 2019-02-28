@@ -173,7 +173,7 @@ namespace Scullery
             return Task.CompletedTask;
         }
 
-        public Task FailedAsync(string id, Exception ex)
+        public Task FailedAsync(string id, Exception ex = null)
         {
             // TODO: Store exception
             SetStatusById(id, JobStatus.Failed);

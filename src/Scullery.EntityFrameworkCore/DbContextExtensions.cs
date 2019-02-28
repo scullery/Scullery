@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.EntityFrameworkCore
 {
-    public static class DbContextExtensions
+    static class DbContextExtensions
     {
         public static bool IsExistingDatabase(this DbContext context)
         {

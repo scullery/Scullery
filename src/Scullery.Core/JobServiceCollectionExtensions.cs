@@ -30,7 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
         /// <param name="setupAction">An <see cref="Action"/> to configure the provided <see cref="SculleryOptions"/>.</param>
-        public static IServiceCollection AddScullery(this IServiceCollection services, Action<SculleryOptions> setupAction)
+        public static IServiceCollection AddScullery(this IServiceCollection services, Action<ScullerySetupOptions> setupAction)
         {
             if (services == null)
             {
@@ -42,12 +42,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(setupAction));
             }
 
-            var options = new SculleryOptions
+            var options = new ScullerySetupOptions
             {
                 InMemoryStore = false
             };
 
-            setupAction(options);
+            setupAction?.Invoke(options);
 
             if (options.InMemoryStore)
             {

@@ -31,7 +31,7 @@ namespace Scullery
         /// <summary>
         /// Waits until a job is ready and returns it.
         /// </summary>
-        /// <returns>The the descriptor of the next job. If the token is cancelled, returns nulls.</returns>
+        /// <returns>The the descriptor of the next job. If the token is cancelled, returns null.</returns>
         Task<JobDescriptor> NextAsync(CancellationToken cancellationToken);
 
         /// <summary>
