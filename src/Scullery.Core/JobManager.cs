@@ -39,5 +39,25 @@ namespace Scullery
         {
             return _jobStore.RecurrentAsync(name, cron, JobResolver.Describe<T>(expression));
         }
+
+        public Task<int> GetJobTotalAsync()
+        {
+            return _jobStore.GetJobTotalAsync();
+        }
+
+        public Task<IReadOnlyList<JobDescriptor>> GetJobsAsync(int skip, int take, bool ascending = false)
+        {
+            return _jobStore.GetJobsAsync(skip, take, ascending);
+        }
+
+        public Task<JobDescriptor> GetJobOrDefaultAsync(string id)
+        {
+            return _jobStore.GetJobOrDefaultAsync(id);
+        }
+
+        public Task DeleteJobAsync(string id)
+        {
+            return _jobStore.DeleteJobAsync(id);
+        }
     }
 }

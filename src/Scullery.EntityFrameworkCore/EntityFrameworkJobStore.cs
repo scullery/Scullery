@@ -55,6 +55,11 @@ namespace Scullery.EntityFrameworkCore
                 return null;
             }
 
+            return ToJobDescriptor(job);
+        }
+
+        private JobDescriptor ToJobDescriptor(Job job)
+        {
             return new JobDescriptor
             {
                 Id = job.Id.ToString(),
@@ -134,19 +139,84 @@ namespace Scullery.EntityFrameworkCore
         //Task TriggerAsync(string name, string cron, JobCall job, TimeZoneInfo timeZone = null);
         //Task RemoveRecurrentAsync(string name);
         //Task DeleteJobAsync(string id);
-        public Task SucceededAsync(string id)
+        public async Task SucceededAsync(string id)
         {
-            return Task.CompletedTask;
+            if (!long.TryParse(id, out long jobId))
+            {
+                throw new ArgumentException("The ID must be an integral value", nameof(id));
+            }
+
+            Job job = await _context.Jobs.Where(j => j.Id == jobId).SingleOrDefaultAsync();
+            if (job != null)
+            {
+                job.Status = JobStatus.Succeeded;
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public Task FailedAsync(string id, Exception ex)
+        public async Task FailedAsync(string id, Exception ex)
         {
-            return Task.CompletedTask;
+            if (!long.TryParse(id, out long jobId))
+            {
+                throw new ArgumentException("The ID must be an integral value", nameof(id));
+            }
+
+            Job job = await _context.Jobs.Where(j => j.Id == jobId).SingleOrDefaultAsync();
+            if (job != null)
+            {
+                job.Status = JobStatus.Failed;
+                await _context.SaveChangesAsync();
+            }
         }
 
         public Task<int> GetCountByStatusAsync(JobStatus status)
         {
             return Task.FromResult(0);
+        }
+
+        public Task<int> GetJobTotalAsync()
+        {
+            return _context.Jobs.CountAsync();
+        }
+
+        public async Task<IReadOnlyList<JobDescriptor>> GetJobsAsync(int skip, int take, bool ascending = false)
+        {
+            IQueryable<Job> query = _context.Jobs;
+            if (ascending)
+                query = query.OrderBy(j => j.Id);
+            else
+                query = query.OrderByDescending(j => j.Id);
+
+            return await query.Skip(skip).Take(take).Select(j => ToJobDescriptor(j)).ToListAsync();
+        }
+
+        public async Task<JobDescriptor> GetJobOrDefaultAsync(string id)
+        {
+            if (!long.TryParse(id, out long jobId))
+            {
+                throw new ArgumentException("The ID must be an integral value", nameof(id));
+            }
+
+            Job job = await _context.Jobs.Where(j => j.Id == jobId).SingleOrDefaultAsync();
+            if (job == null)
+                return null;
+
+            return ToJobDescriptor(job);
+        }
+
+        public async Task DeleteJobAsync(string id)
+        {
+            if (!long.TryParse(id, out long jobId))
+            {
+                throw new ArgumentException("The ID must be an integral value", nameof(id));
+            }
+
+            Job job = await _context.Jobs.Where(j => j.Id == jobId).SingleOrDefaultAsync();
+            if (job == null)
+                return;
+
+            _context.Jobs.Remove(job);
+            await _context.SaveChangesAsync();
         }
 
         private async Task<Job> EnqueueAsync(JobCall call, JobStatus status, DateTime? scheduled, TimeZoneInfo timeZone = null)

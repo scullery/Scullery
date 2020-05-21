@@ -188,6 +188,50 @@ namespace Scullery
             }
         }
 
+        public Task<int> GetJobTotalAsync()
+        {
+            return Task.FromResult( _jobs.Count());
+        }
+
+        public Task<IReadOnlyList<JobDescriptor>> GetJobsAsync(int skip, int take, bool ascending = false)
+        {
+            IEnumerable<JobDescriptor> query = _jobs;
+            if (ascending)
+                query = query.OrderBy(j => int.Parse(j.Id));
+            else
+                query = query.OrderByDescending(j => int.Parse(j.Id));
+
+            IReadOnlyList<JobDescriptor> list = query.Skip(skip).Take(take).ToList();
+
+            return Task.FromResult(list);
+        }
+
+        public Task<JobDescriptor> GetJobOrDefaultAsync(string id)
+        {
+            if (!int.TryParse(id, out int jobId))
+            {
+                throw new ArgumentException("The ID must be an integral value", nameof(id));
+            }
+
+            return Task.FromResult(_jobs.Where(j => int.Parse(j.Id) == jobId).SingleOrDefault());
+        }
+
+        public Task DeleteJobAsync(string id)
+        {
+            if (!int.TryParse(id, out int jobId))
+            {
+                throw new ArgumentException("The ID must be an integral value", nameof(id));
+            }
+
+            JobDescriptor job = _jobs.Where(j => int.Parse(j.Id) == jobId).SingleOrDefault();
+            if (job != null)
+            {
+                _jobs.Remove(job);
+            }
+
+            return Task.CompletedTask;
+        }
+
         private void SetStatusById(string id, JobStatus status)
         {
             lock (_syncLock)

@@ -49,5 +49,9 @@ namespace Scullery
         Task SucceededAsync(string id);
         Task FailedAsync(string id, Exception ex);
         Task<int> GetCountByStatusAsync(JobStatus status);
+        Task<int> GetJobTotalAsync();
+        Task<IReadOnlyList<JobDescriptor>> GetJobsAsync(int skip, int take, bool ascending = false);
+        Task<JobDescriptor> GetJobOrDefaultAsync(string id);
+        Task DeleteJobAsync(string id);
     }
 }
