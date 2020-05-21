@@ -29,12 +29,20 @@ namespace Scullery
         {
             _logger.LogInformation("Job service is starting.");
 
+            bool started = false;
             while (!cancellationToken.IsCancellationRequested)
             {
                 using (var serviceScope = _services.CreateScope())
                 {
                     var scopeServiceProvider = serviceScope.ServiceProvider;
                     IJobStore jobStore = scopeServiceProvider.GetRequiredService<IJobStore>();
+                    IJobServiceEvents jobServiceEvents = scopeServiceProvider.GetRequiredService<IJobServiceEvents>();
+
+                    if (!started)
+                    {
+                        await jobServiceEvents.OnStartedAsync();
+                        started = true;
+                    }
 
                     JobDescriptor job;
                     try
@@ -50,13 +58,16 @@ namespace Scullery
                             break;
                         }
                     }
+                    catch (TaskCanceledException ex)
+                    {
+                        _logger.LogInformation(ex, "The service was stopped while waiting for a job");
+                        await jobServiceEvents.OnStoppedAsync();
+                        break;
+                    }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, $"Error occurred loading job.");
-
-                        IJobServiceEvents jobServiceEvents = scopeServiceProvider.GetRequiredService<IJobServiceEvents>();
-                        await jobServiceEvents.OnStoppedAsync($"Error occurred loading job.", ex);
-
+                        _logger.LogError(ex, "An error occurred while waiting for a job");
+                        await jobServiceEvents.OnFailedAsync(ex);
                         break;
                     }
 
@@ -93,9 +104,10 @@ namespace Scullery
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, $"Error occurred executing job.");
+                        _logger.LogError(ex, $"An error occurred while executing job ID '{job.Id}'");
 
                         await jobStore.FailedAsync(job.Id, ex);
+                        await jobServiceEvents.OnFailedAsync(ex);
                     }
                 }
             }

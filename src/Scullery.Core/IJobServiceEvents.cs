@@ -8,6 +8,8 @@ namespace Scullery
 {
     public interface IJobServiceEvents
     {
-        Task OnStoppedAsync(string message, Exception ex);
+        Task OnStartedAsync();
+        Task OnStoppedAsync();
+        Task OnFailedAsync(Exception ex);
     }
 }
