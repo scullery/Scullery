@@ -47,13 +47,13 @@ namespace Scullery.EntityFrameworkCore
             if (_context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
             {
                 // Quote identifiers to prevent case folding on PG.
-                result = await _context.Database.ExecuteSqlCommandAsync($@"UPDATE ""Jobs"" 
+                result = await _context.Database.ExecuteSqlInterpolatedAsync($@"UPDATE ""Jobs"" 
 SET ""Status"" = {(int)JobStatus.Running}
 WHERE ""Id"" = {job.Id} AND ""Status"" = {(int)JobStatus.Ready}");
             }
             else
             {
-                result = await _context.Database.ExecuteSqlCommandAsync($@"UPDATE Jobs 
+                result = await _context.Database.ExecuteSqlInterpolatedAsync($@"UPDATE Jobs 
 SET Status = {(int)JobStatus.Running}
 WHERE Id = {job.Id} AND Status = {(int)JobStatus.Ready}");
             }
