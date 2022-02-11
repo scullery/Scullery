@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-
-namespace Scullery.EntityFrameworkCore
+﻿namespace Scullery.EntityFrameworkCore
 {
     public class SculleryContextFactory : IDesignTimeDbContextFactory<SculleryContext>
     {

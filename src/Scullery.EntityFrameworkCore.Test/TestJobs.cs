@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-
-namespace Scullery.EntityFrameworkCore.Test
+﻿namespace Scullery.EntityFrameworkCore.Test
 {
     public class TestJobs
     {

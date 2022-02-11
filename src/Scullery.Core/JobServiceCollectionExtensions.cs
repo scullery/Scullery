@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.Hosting;
-using Scullery;
+﻿using Scullery;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

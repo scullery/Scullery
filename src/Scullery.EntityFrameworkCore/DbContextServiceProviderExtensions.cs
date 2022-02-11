@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-
-namespace Microsoft.Extensions.DependencyInjection
+﻿namespace Microsoft.Extensions.DependencyInjection
 {
     static class DbContextServiceProviderExtensions
     {

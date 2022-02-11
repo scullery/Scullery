@@ -1,8 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
-
-namespace Scullery.EntityFrameworkCore
+﻿namespace Scullery.EntityFrameworkCore
 {
     public class Job
     {

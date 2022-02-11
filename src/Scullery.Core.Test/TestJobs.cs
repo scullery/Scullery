@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Scullery.Test
+﻿namespace Scullery.Test
 {
     public class TestJobs
     {

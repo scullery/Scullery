@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-
-namespace Scullery.EntityFrameworkCore
+﻿namespace Scullery.EntityFrameworkCore
 {
     /// <summary>
     /// Adapts the job store to use standard SQL for pulling jobs from the queue.
