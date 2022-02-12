@@ -1,9 +1,8 @@
-﻿namespace Scullery
+﻿namespace Scullery;
+
+public interface IJobServiceEvents
 {
-    public interface IJobServiceEvents
-    {
-        Task OnStartedAsync();
-        Task OnStoppedAsync();
-        Task OnFailedAsync(Exception ex);
-    }
+    Task OnStartedAsync();
+    Task OnStoppedAsync();
+    Task OnFailedAsync(Exception ex);
 }

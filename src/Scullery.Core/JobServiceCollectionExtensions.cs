@@ -1,56 +1,55 @@
 ﻿using Scullery;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+public static class JobServiceCollectionExtensions
 {
-    public static class JobServiceCollectionExtensions
+    /// <summary>
+    /// Adds Scullery services to the specified <see cref="IServiceCollection"/>.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+    public static IServiceCollection AddScullery(this IServiceCollection services)
     {
-        /// <summary>
-        /// Adds Scullery services to the specified <see cref="IServiceCollection"/>.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
-        public static IServiceCollection AddScullery(this IServiceCollection services)
+        if (services == null)
         {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            services.AddSingleton<IHostedService, JobService>();
-            services.AddScoped<JobManager>();
-
-            return services;
+            throw new ArgumentNullException(nameof(services));
         }
 
-        /// <summary>
-        /// Adds Scullery services to the specified <see cref="IServiceCollection"/>.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
-        /// <param name="setupAction">An <see cref="Action"/> to configure the provided <see cref="SculleryOptions"/>.</param>
-        public static IServiceCollection AddScullery(this IServiceCollection services, Action<ScullerySetupOptions> setupAction)
+        services.AddSingleton<IHostedService, JobService>();
+        services.AddScoped<JobManager>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Adds Scullery services to the specified <see cref="IServiceCollection"/>.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+    /// <param name="setupAction">An <see cref="Action"/> to configure the provided <see cref="SculleryOptions"/>.</param>
+    public static IServiceCollection AddScullery(this IServiceCollection services, Action<ScullerySetupOptions> setupAction)
+    {
+        if (services == null)
         {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            if (setupAction == null)
-            {
-                throw new ArgumentNullException(nameof(setupAction));
-            }
-
-            var options = new ScullerySetupOptions
-            {
-                InMemoryStore = false
-            };
-
-            setupAction?.Invoke(options);
-
-            if (options.InMemoryStore)
-            {
-                services.AddSingleton<IJobStore, MemoryJobStore>();
-            }
-
-            return services.AddScullery();
+            throw new ArgumentNullException(nameof(services));
         }
+
+        if (setupAction == null)
+        {
+            throw new ArgumentNullException(nameof(setupAction));
+        }
+
+        var options = new ScullerySetupOptions
+        {
+            InMemoryStore = false
+        };
+
+        setupAction?.Invoke(options);
+
+        if (options.InMemoryStore)
+        {
+            services.AddSingleton<IJobStore, MemoryJobStore>();
+        }
+
+        return services.AddScullery();
     }
 }

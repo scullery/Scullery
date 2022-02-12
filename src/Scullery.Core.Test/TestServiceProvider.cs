@@ -1,10 +1,9 @@
-﻿namespace Scullery.Test
+﻿namespace Scullery.Test;
+
+public class TestServiceProvider : IServiceProvider
 {
-    public class TestServiceProvider : IServiceProvider
+    public object GetService(Type serviceType)
     {
-        public object GetService(Type serviceType)
-        {
-            return null;
-        }
+        return null;
     }
 }

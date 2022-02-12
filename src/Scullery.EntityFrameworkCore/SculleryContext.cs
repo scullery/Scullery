@@ -1,24 +1,23 @@
-﻿namespace Scullery.EntityFrameworkCore
+﻿namespace Scullery.EntityFrameworkCore;
+
+public class SculleryContext : DbContext
 {
-    public class SculleryContext : DbContext
+    public SculleryContext(DbContextOptions<SculleryContext> options)
+        : base(options)
     {
-        public SculleryContext(DbContextOptions<SculleryContext> options)
-            : base(options)
-        {
-        }
+    }
 
-        public DbSet<Job> Jobs { get; set; }
+    public DbSet<Job> Jobs { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
 
-            //
-            // Keys
-            //
+        //
+        // Keys
+        //
 
-            modelBuilder.Entity<Job>()
-                .HasKey(x => x.Id);
-       }
+        modelBuilder.Entity<Job>()
+            .HasKey(x => x.Id);
     }
 }

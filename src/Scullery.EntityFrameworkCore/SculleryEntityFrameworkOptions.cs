@@ -1,7 +1,6 @@
-﻿namespace Scullery
+﻿namespace Scullery;
+
+public class SculleryEntityFrameworkOptions
 {
-    public class SculleryEntityFrameworkOptions
-    {
-        public int SleepMilliseconds { get; set; }
-    }
+    public int SleepMilliseconds { get; set; }
 }

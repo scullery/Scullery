@@ -1,44 +1,43 @@
-﻿namespace Microsoft.Extensions.DependencyInjection
+﻿namespace Microsoft.Extensions.DependencyInjection;
+
+static class DbContextServiceProviderExtensions
 {
-    static class DbContextServiceProviderExtensions
+    public static void InitializeDatabase<T>(this IServiceProvider serviceProvider) where T : DbContext
     {
-        public static void InitializeDatabase<T>(this IServiceProvider serviceProvider) where T : DbContext
+        using (var serviceScope = serviceProvider.CreateScope())
         {
-            using (var serviceScope = serviceProvider.CreateScope())
+            var scopeServiceProvider = serviceScope.ServiceProvider;
+            using (var context = scopeServiceProvider.GetService<T>())
             {
-                var scopeServiceProvider = serviceScope.ServiceProvider;
-                using (var context = scopeServiceProvider.GetService<T>())
+                var logger = scopeServiceProvider.GetRequiredService<ILogger<T>>();
+
+                if (context.IsExistingDatabase())
                 {
-                    var logger = scopeServiceProvider.GetRequiredService<ILogger<T>>();
+                    logger.LogTrace("Database exists");
 
-                    if (context.IsExistingDatabase())
+                    if (context.AnyMigrationsRewritten())
                     {
-                        logger.LogTrace("Database exists");
+                        logger.LogWarning("Recreating database");
 
-                        if (context.AnyMigrationsRewritten())
-                        {
-                            logger.LogWarning("Recreating database");
-
-                            context.Database.EnsureDeleted();
-                        }
-
-                        if (!context.AllMigrationsApplied())
-                        {
-                            logger.LogInformation("Migrating database");
-
-                            context.Database.Migrate();
-                        }
+                        context.Database.EnsureDeleted();
                     }
-                    else
+
+                    if (!context.AllMigrationsApplied())
                     {
-                        logger.LogInformation("Creating database");
+                        logger.LogInformation("Migrating database");
 
                         context.Database.Migrate();
                     }
                 }
+                else
+                {
+                    logger.LogInformation("Creating database");
 
-                // Seed.EnsureSeedData(scopeServiceProvider);
+                    context.Database.Migrate();
+                }
             }
+
+            // Seed.EnsureSeedData(scopeServiceProvider);
         }
     }
 }
