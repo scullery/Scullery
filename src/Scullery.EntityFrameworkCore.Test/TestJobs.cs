@@ -30,7 +30,7 @@ public class TestJobs
         Assert.Equal(float.MaxValue, model.FloatValue);
         Assert.Equal(double.MinValue, model.DoubleValue);
         Assert.True(model.BoolValue);
-        Assert.Equal("ChildValue", model.ChildValue.StringValue);
+        Assert.Equal("ChildValue", model.ChildValue!.StringValue);
         Assert.Equal(int.MaxValue, model.ChildValue.IntValue);
         Assert.False(model.ChildValue.BoolValue);
     }
@@ -69,7 +69,7 @@ public class TestJobs
 
 public class ParentModel
 {
-    public string StringValue { get; set; }
+    public string? StringValue { get; set; }
     public short ShortValue { get; set; }
     public ushort UShortValue { get; set; }
     public int IntValue { get; set; }
@@ -79,14 +79,14 @@ public class ParentModel
     public float FloatValue { get; set; }
     public double DoubleValue { get; set; }
     public bool BoolValue { get; set; }
-    public object[] ArrayValue { get; set; }
-    public ChildModel ChildValue { get; set; }
+    public object[]? ArrayValue { get; set; }
+    public ChildModel? ChildValue { get; set; }
 }
 
 public class ChildModel
 {
-    public string StringValue { get; set; }
+    public string? StringValue { get; set; }
     public int IntValue { get; set; }
     public bool BoolValue { get; set; }
-    public object[] ArrayValue { get; set; }
+    public object[]? ArrayValue { get; set; }
 }

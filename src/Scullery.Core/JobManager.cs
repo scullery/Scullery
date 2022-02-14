@@ -31,7 +31,7 @@ public class JobManager
         return _jobStore.EnqueueAsync(JobResolver.Describe<T>(expression));
     }
 
-    public Task RecurrentAsync<T>(string name, string cron, Expression<Func<T, Task>> expression, TimeZoneInfo timeZone = null)
+    public Task RecurrentAsync<T>(string name, string cron, Expression<Func<T, Task>> expression, TimeZoneInfo? timeZone = null)
     {
         return _jobStore.RecurrentAsync(name, cron, JobResolver.Describe<T>(expression));
     }
@@ -46,7 +46,7 @@ public class JobManager
         return _jobStore.GetJobsAsync(skip, take, ascending);
     }
 
-    public Task<JobDescriptor> GetJobOrDefaultAsync(string id)
+    public Task<JobDescriptor?> GetJobOrDefaultAsync(string id)
     {
         return _jobStore.GetJobOrDefaultAsync(id);
     }

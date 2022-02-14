@@ -13,9 +13,9 @@ class SqlJobStoreAdapter : IEntityFrameworkJobStoreAdapter
         _context = context;
     }
 
-    public async Task<Job> TryNextAsync()
+    public async Task<Job?> TryNextAsync()
     {
-        Job job;
+        Job? job;
 
         do
         {
@@ -29,7 +29,7 @@ class SqlJobStoreAdapter : IEntityFrameworkJobStoreAdapter
         return job;
     }
 
-    public Task<Job> GetCandidateJobAsync()
+    public Task<Job?> GetCandidateJobAsync()
     {
         return _context.Jobs.Where(j => j.Status == JobStatus.Ready).OrderBy(j => j.Scheduled).FirstOrDefaultAsync();
     }

@@ -60,6 +60,9 @@ public class JobResolver
         {
             if (arg is ConstantExpression cexp)
             {
+                if (cexp.Value == null)
+                    throw new Exception("Constant argument is null");
+
                 args.Add(cexp.Value);
             }
             else if (arg is MemberExpression mexp)
@@ -74,9 +77,9 @@ public class JobResolver
 
         return new JobCall
         {
-            Type = member.Method.DeclaringType.AssemblyQualifiedName,
+            Type = member.Method.DeclaringType?.AssemblyQualifiedName ?? throw new Exception("Method type assembly not found"),
             Method = member.Method.Name,
-            Returns = member.Method.ReturnType.FullName,
+            Returns = member.Method.ReturnType.FullName ?? throw new Exception("Method return type not found"),
             IsStatic = member.Object == null,
             Arguments = args.ToArray()
         };

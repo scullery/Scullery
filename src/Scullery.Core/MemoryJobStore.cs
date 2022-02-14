@@ -10,9 +10,9 @@ public class MemoryJobStore : IJobStore
     private static object _syncLock = new object();
     private int _idSource = 0;
 
-    public Task<JobDescriptor> TryNextAsync()
+    public Task<JobDescriptor?> TryNextAsync()
     {
-        JobDescriptor waiting;
+        JobDescriptor? waiting;
         lock (_syncLock)
         {
             waiting = _jobs
@@ -40,18 +40,18 @@ public class MemoryJobStore : IJobStore
             }
         }
 
-        JobDescriptor job;
+        JobDescriptor? job;
         _queue.TryDequeue(out job);
 
         return Task.FromResult(job);
     }
 
-    public async Task<JobDescriptor> NextAsync(CancellationToken cancellationToken)
+    public async Task<JobDescriptor?> NextAsync(CancellationToken cancellationToken)
     {
-        JobDescriptor job;
+        JobDescriptor? job;
         do
         {
-            JobDescriptor waiting;
+            JobDescriptor? waiting;
             lock (_syncLock)
             {
                 waiting = _jobs
@@ -94,7 +94,7 @@ public class MemoryJobStore : IJobStore
             _queue.TryDequeue(out job);
         } while (job == null && !cancellationToken.IsCancellationRequested);
 
-        return job;
+        return job!;
     }
 
     public Task<string> EnqueueAsync(JobCall job)
@@ -112,7 +112,7 @@ public class MemoryJobStore : IJobStore
         return Task.FromResult(jobDescriptor.Id);
     }
 
-    public Task<string> ScheduleAsync(JobCall job, DateTime scheduled, TimeZoneInfo timeZone = null)
+    public Task<string> ScheduleAsync(JobCall job, DateTime scheduled, TimeZoneInfo? timeZone = null)
     {
         if (job == null)
         {
@@ -127,7 +127,7 @@ public class MemoryJobStore : IJobStore
         return Task.FromResult(jobDescriptor.Id);
     }
 
-    private JobDescriptor Enqueue(JobCall job, JobStatus status, DateTime? scheduled, TimeZoneInfo timeZone = null)
+    private JobDescriptor Enqueue(JobCall job, JobStatus status, DateTime? scheduled, TimeZoneInfo? timeZone = null)
     {
         if (job == null)
         {
@@ -157,7 +157,7 @@ public class MemoryJobStore : IJobStore
         return jobDescriptor;
     }
 
-    public Task RecurrentAsync(string name, string cron, JobCall job, TimeZoneInfo timeZone = null)
+    public Task RecurrentAsync(string name, string cron, JobCall job, TimeZoneInfo? timeZone = null)
     {
         return Task.CompletedTask;
     }
@@ -168,7 +168,7 @@ public class MemoryJobStore : IJobStore
         return Task.CompletedTask;
     }
 
-    public Task FailedAsync(string id, Exception ex = null)
+    public Task FailedAsync(string id, Exception? ex = null)
     {
         // TODO: Store exception
         SetStatusById(id, JobStatus.Failed);
@@ -201,7 +201,7 @@ public class MemoryJobStore : IJobStore
         return Task.FromResult(list);
     }
 
-    public Task<JobDescriptor> GetJobOrDefaultAsync(string id)
+    public Task<JobDescriptor?> GetJobOrDefaultAsync(string id)
     {
         if (!int.TryParse(id, out int jobId))
         {
@@ -218,7 +218,7 @@ public class MemoryJobStore : IJobStore
             throw new ArgumentException("The ID must be an integral value", nameof(id));
         }
 
-        JobDescriptor job = _jobs.Where(j => int.Parse(j.Id) == jobId).SingleOrDefault();
+        JobDescriptor? job = _jobs.Where(j => int.Parse(j.Id) == jobId).SingleOrDefault();
         if (job != null)
         {
             _jobs.Remove(job);
@@ -231,7 +231,7 @@ public class MemoryJobStore : IJobStore
     {
         lock (_syncLock)
         {
-            JobDescriptor job = _jobs.Where(j => j.Id == id).SingleOrDefault();
+            JobDescriptor? job = _jobs.Where(j => j.Id == id).SingleOrDefault();
             if (job != null)
                 job.Status = status;
         }

@@ -9,6 +9,9 @@ static class DbContextServiceProviderExtensions
             var scopeServiceProvider = serviceScope.ServiceProvider;
             using (var context = scopeServiceProvider.GetService<T>())
             {
+                if (context == null)
+                    throw new InvalidOperationException("Unable to resolve database context");
+
                 var logger = scopeServiceProvider.GetRequiredService<ILogger<T>>();
 
                 if (context.IsExistingDatabase())

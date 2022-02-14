@@ -2,7 +2,7 @@
 
 public interface IEntityFrameworkJobStoreAdapter
 {
-    Task<Job> TryNextAsync();
+    Task<Job?> TryNextAsync();
 }
 
 internal class EntityFrameworkJobStore : IJobStore
@@ -16,8 +16,8 @@ internal class EntityFrameworkJobStore : IJobStore
 
     public EntityFrameworkJobStore(
         SculleryContext context,
-        IOptions<SculleryEntityFrameworkOptions> options = null,
-        IEntityFrameworkJobStoreAdapter adapter = null)
+        IOptions<SculleryEntityFrameworkOptions>? options = null,
+        IEntityFrameworkJobStoreAdapter? adapter = null)
     {
         _context = context;
         _adapter = adapter ?? new SqlJobStoreAdapter(context);
@@ -38,9 +38,9 @@ internal class EntityFrameworkJobStore : IJobStore
     /// If a job is available, returns it. Otherwise, returns null.
     /// </summary>
     /// <returns>The the descriptor of the next job, if available.</returns>
-    public async Task<JobDescriptor> TryNextAsync()
+    public async Task<JobDescriptor?> TryNextAsync()
     {
-        Job job = await _adapter.TryNextAsync();
+        Job? job = await _adapter.TryNextAsync();
         if (job == null)
         {
             return null;
@@ -76,9 +76,9 @@ internal class EntityFrameworkJobStore : IJobStore
     /// Waits until a job is ready and returns it.
     /// </summary>
     /// <returns>The the descriptor of the next job.</returns>
-    public async Task<JobDescriptor> NextAsync(CancellationToken cancellationToken)
+    public async Task<JobDescriptor?> NextAsync(CancellationToken cancellationToken)
     {
-        JobDescriptor job;
+        JobDescriptor? job;
 
         do
         {
@@ -110,7 +110,7 @@ internal class EntityFrameworkJobStore : IJobStore
         return result.Id.ToString();
     }
 
-    public async Task<string> ScheduleAsync(JobCall job, DateTime scheduled, TimeZoneInfo timeZone = null)
+    public async Task<string> ScheduleAsync(JobCall job, DateTime scheduled, TimeZoneInfo? timeZone = null)
     {
         if (job == null)
         {
@@ -122,7 +122,7 @@ internal class EntityFrameworkJobStore : IJobStore
         return result.Id.ToString();
     }
 
-    public Task RecurrentAsync(string name, string cron, JobCall job, TimeZoneInfo timeZone = null)
+    public Task RecurrentAsync(string name, string cron, JobCall job, TimeZoneInfo? timeZone = null)
     {
         return Task.CompletedTask;
     }
@@ -137,7 +137,7 @@ internal class EntityFrameworkJobStore : IJobStore
             throw new ArgumentException("The ID must be an integral value", nameof(id));
         }
 
-        Job job = await _context.Jobs.Where(j => j.Id == jobId).SingleOrDefaultAsync();
+        Job? job = await _context.Jobs.Where(j => j.Id == jobId).SingleOrDefaultAsync();
         if (job != null)
         {
             job.Status = JobStatus.Succeeded;
@@ -145,14 +145,14 @@ internal class EntityFrameworkJobStore : IJobStore
         }
     }
 
-    public async Task FailedAsync(string id, Exception ex)
+    public async Task FailedAsync(string id, Exception? ex)
     {
         if (!long.TryParse(id, out long jobId))
         {
             throw new ArgumentException("The ID must be an integral value", nameof(id));
         }
 
-        Job job = await _context.Jobs.Where(j => j.Id == jobId).SingleOrDefaultAsync();
+        Job? job = await _context.Jobs.Where(j => j.Id == jobId).SingleOrDefaultAsync();
         if (job != null)
         {
             job.Status = JobStatus.Failed;
@@ -181,14 +181,14 @@ internal class EntityFrameworkJobStore : IJobStore
         return await query.Skip(skip).Take(take).Select(j => ToJobDescriptor(j)).ToListAsync();
     }
 
-    public async Task<JobDescriptor> GetJobOrDefaultAsync(string id)
+    public async Task<JobDescriptor?> GetJobOrDefaultAsync(string id)
     {
         if (!long.TryParse(id, out long jobId))
         {
             throw new ArgumentException("The ID must be an integral value", nameof(id));
         }
 
-        Job job = await _context.Jobs.Where(j => j.Id == jobId).SingleOrDefaultAsync();
+        Job? job = await _context.Jobs.Where(j => j.Id == jobId).SingleOrDefaultAsync();
         if (job == null)
             return null;
 
@@ -202,7 +202,7 @@ internal class EntityFrameworkJobStore : IJobStore
             throw new ArgumentException("The ID must be an integral value", nameof(id));
         }
 
-        Job job = await _context.Jobs.Where(j => j.Id == jobId).SingleOrDefaultAsync();
+        Job? job = await _context.Jobs.Where(j => j.Id == jobId).SingleOrDefaultAsync();
         if (job == null)
             return;
 
@@ -210,7 +210,7 @@ internal class EntityFrameworkJobStore : IJobStore
         await _context.SaveChangesAsync();
     }
 
-    private async Task<Job> EnqueueAsync(JobCall call, JobStatus status, DateTime? scheduled, TimeZoneInfo timeZone = null)
+    private async Task<Job> EnqueueAsync(JobCall call, JobStatus status, DateTime? scheduled, TimeZoneInfo? timeZone = null)
     {
         if (call == null)
         {
@@ -222,7 +222,7 @@ internal class EntityFrameworkJobStore : IJobStore
             throw new ArgumentNullException(nameof(scheduled));
         }
 
-        (string parameters, string arguments) = SerializeArguments(call);
+        (string? parameters, string? arguments) = SerializeArguments(call);
 
         var job = new Job
         {
@@ -244,10 +244,10 @@ internal class EntityFrameworkJobStore : IJobStore
         return job;
     }
 
-    private (string parameters, string arguments) SerializeArguments(JobCall call)
+    private (string? parameters, string? arguments) SerializeArguments(JobCall call)
     {
-        string parameters = null;
-        string arguments = null;
+        string? parameters = null;
+        string? arguments = null;
         if (call.Arguments != null && call.Arguments.Length > 0)
         {
             var parms = new List<string>();
@@ -255,7 +255,11 @@ internal class EntityFrameworkJobStore : IJobStore
 
             foreach (object arg in call.Arguments)
             {
-                parms.Add(arg.GetType().AssemblyQualifiedName);
+                Type? type = arg.GetType();
+                if (type == null || string.IsNullOrWhiteSpace(type.AssemblyQualifiedName))
+                    throw new Exception("Unable to resolve assembly name of argument");
+
+                parms.Add(type.AssemblyQualifiedName);
                 args.Add(JsonConvert.SerializeObject(arg));
             }
 
@@ -266,24 +270,33 @@ internal class EntityFrameworkJobStore : IJobStore
         return (parameters, arguments);
     }
 
-    private object[] DeserializeArguments(string parameters, string arguments)
+    private object[] DeserializeArguments(string? parameters, string? arguments)
     {
-        if (parameters == null)
+        if (parameters == null || arguments == null)
             return new object[0];
 
-        List<string> parms = JsonConvert.DeserializeObject<List<string>>(parameters);
-        List<string> args = JsonConvert.DeserializeObject<List<string>>(arguments);
-        if (parms.Count != args.Count)
+        List<string>? parms = JsonConvert.DeserializeObject<List<string>>(parameters);
+        List<string>? args = JsonConvert.DeserializeObject<List<string>>(arguments);
+        if (parms != null && args != null && parms.Count != args.Count)
         {
             throw new Exception("Parameter and argument count mismatch");
         }
 
         var list = new List<object>();
-        for (int i = 0; i < parms.Count; i++)
+        if (parms != null && args != null)
         {
-            Type type = Type.GetType(parms[i]);
-            object value = JsonConvert.DeserializeObject(args[i], type);
-            list.Add(value);
+            for (int i = 0; i < parms.Count; i++)
+            {
+                Type? type = Type.GetType(parms[i]);
+                if (type != null)
+                {
+                    object? value = JsonConvert.DeserializeObject(args[i], type);
+                    if (value != null)
+                    {
+                        list.Add(value);
+                    }
+                }
+            }
         }
 
         return list.ToArray();

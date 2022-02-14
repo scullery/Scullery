@@ -4,7 +4,7 @@ namespace Scullery.EntityFrameworkCore.Test;
 
 public class SqliteInMemoryHelper
 {
-    public static async Task UsingSculleryContextAsync(Func<SculleryContext, Task> callback, Func<SculleryContext, Task> second = null)
+    public static async Task UsingSculleryContextAsync(Func<SculleryContext, Task> callback, Func<SculleryContext, Task>? second = null)
     {
         // In-memory database only exists while the connection is open
         var connection = new SqliteConnection("DataSource=:memory:");

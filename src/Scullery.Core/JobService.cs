@@ -35,7 +35,7 @@ public class JobService : BackgroundService
                     started = true;
                 }
 
-                JobDescriptor job;
+                JobDescriptor? job;
                 try
                 {
                     job = await jobStore.NextAsync(cancellationToken);

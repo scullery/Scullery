@@ -5,6 +5,7 @@
     <IsPackable>false</IsPackable>
     <RootNamespace>Scullery.Test</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

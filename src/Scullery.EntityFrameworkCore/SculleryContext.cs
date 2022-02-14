@@ -7,7 +7,7 @@ public class SculleryContext : DbContext
     {
     }
 
-    public DbSet<Job> Jobs { get; set; }
+    public DbSet<Job> Jobs { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

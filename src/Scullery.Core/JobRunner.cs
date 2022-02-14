@@ -46,15 +46,20 @@ public class JobRunner : IJobRunner
         if (job.Returns != TaskTypeName)
             throw new ArgumentException("Async method must return a Task", nameof(job));
 
-        object result = InvokeMember(job.Type, job.IsStatic, job.Method, job.Arguments);
+        object? result = InvokeMember(job.Type, job.IsStatic, job.Method, job.Arguments);
+        if (result == null)
+            throw new Exception("Expected a task result");
 
         return (Task)result;
     }
 
-    public object InvokeMember(string assemblyQualifiedName, bool isStatic, string methodName, object[] args)
+    public object? InvokeMember(string assemblyQualifiedName, bool isStatic, string methodName, object[] args)
     {
-        Type calledType = Type.GetType(assemblyQualifiedName);
-        object instance = null;
+        Type? calledType = Type.GetType(assemblyQualifiedName);
+        if (calledType == null)
+            throw new Exception("Assembly type not found");
+
+        object? instance = null;
         BindingFlags flags = BindingFlags.InvokeMethod | BindingFlags.Public;
         if (isStatic)
         {

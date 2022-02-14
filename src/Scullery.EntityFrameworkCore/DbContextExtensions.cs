@@ -5,7 +5,7 @@ static class DbContextExtensions
     public static bool IsExistingDatabase(this DbContext context)
     {
         var databaseCreator = context.Database.GetService<IDatabaseCreator>();
-        var relationalCreator = (databaseCreator as RelationalDatabaseCreator);
+        var relationalCreator = (RelationalDatabaseCreator)databaseCreator;
         return relationalCreator.Exists();
     }
 
