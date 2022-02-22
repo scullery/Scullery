@@ -4,6 +4,8 @@ setlocal
 if not exist version.cmd goto nover
 call version.cmd
 
+set _CONFIGURATION=Release
+
 for %%I in (
     Scullery.Core
     Scullery.EntityFrameworkCore
@@ -33,7 +35,7 @@ rem * Build
 rem *
 
 pushd src\%_ASSEMBLY%
-dotnet build
+dotnet build --configuration %_CONFIGURATION%
 popd
 
 rem *
@@ -43,9 +45,9 @@ rem *
 mkdir build
 mkdir build\%_ASSEMBLY%
 mkdir build\%_ASSEMBLY%\lib
-mkdir build\%_ASSEMBLY%\lib\netstandard2.0
+mkdir build\%_ASSEMBLY%\lib\net6.0
 
-copy /y src\%_ASSEMBLY%\bin\Debug\netstandard2.0\%_ASSEMBLY%.dll build\%_ASSEMBLY%\lib\netstandard2.0
+copy /y src\%_ASSEMBLY%\bin\%_CONFIGURATION%\net6.0\%_ASSEMBLY%.dll build\%_ASSEMBLY%\lib\net6.0
 copy /y src\%_ASSEMBLY%\%_ASSEMBLY%.nuspec build\%_ASSEMBLY%
 
 call :create
