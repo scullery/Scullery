@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Scullery.EntityFrameworkCore;
@@ -11,17 +12,16 @@ using Scullery.EntityFrameworkCore;
 namespace Scullery.EntityFrameworkCore.Migrations
 {
     [DbContext(typeof(SculleryContext))]
-    partial class SculleryContextModelSnapshot : ModelSnapshot
+    [Migration("20220222203405_Net6")]
+    partial class Net6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            // NOTE: This isn't compatible with versions of PG prior to 10.
-            // There is also a bug that causes two columns to be added.
             // NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Scullery.EntityFrameworkCore.Job", b =>
