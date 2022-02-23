@@ -1,1 +1,1 @@
-set _VERSION=0.0.5-alpha
+set _VERSION=0.0.6-alpha

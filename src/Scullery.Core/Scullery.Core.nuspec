@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
     <metadata>
         <id>Scullery.Core</id>
-        <version>0.0.5-alpha</version>
+        <version>0.0.6-alpha</version>
         <title>Scullery.Core</title>
         <authors>Todd Lucas</authors>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -17,7 +17,7 @@
 
         <releaseNotes>This software is experimental
 
-0.0.5-alpha
+0.0.6-alpha
 
 This is an alpha release.
         </releaseNotes>
