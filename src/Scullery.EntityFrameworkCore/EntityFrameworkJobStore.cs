@@ -49,7 +49,7 @@ internal class EntityFrameworkJobStore : IJobStore
         return ToJobDescriptor(job);
     }
 
-    private JobDescriptor ToJobDescriptor(Job job)
+    private static JobDescriptor ToJobDescriptor(Job job)
     {
         return new JobDescriptor
         {
@@ -244,7 +244,7 @@ internal class EntityFrameworkJobStore : IJobStore
         return job;
     }
 
-    private (string? parameters, string? arguments) SerializeArguments(JobCall call)
+    private static (string? parameters, string? arguments) SerializeArguments(JobCall call)
     {
         string? parameters = null;
         string? arguments = null;
@@ -270,7 +270,7 @@ internal class EntityFrameworkJobStore : IJobStore
         return (parameters, arguments);
     }
 
-    private object[] DeserializeArguments(string? parameters, string? arguments)
+    private static object[] DeserializeArguments(string? parameters, string? arguments)
     {
         if (parameters == null || arguments == null)
             return new object[0];
